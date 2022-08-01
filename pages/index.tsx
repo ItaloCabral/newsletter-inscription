@@ -1,5 +1,9 @@
 import type { NextPage } from 'next'
 import { FormEvent, useState } from 'react'
+
+import { toast, ToastOptions, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import axios from 'axios';
 
 const Home: NextPage = () => {
@@ -10,9 +14,30 @@ const Home: NextPage = () => {
     event.preventDefault();
     if(emailInput.length === 0) return;
 
+    let toastOptions: ToastOptions<{}> = {
+      autoClose: 2000,
+      position: "top-right",
+      closeButton: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      theme: "dark",
+    }
+
     axios.post('/api/subscribe', {
       email: emailInput
-    }).then(console.log)
+    }).then(response => {
+      toast(response.data.message, {
+        ...toastOptions,
+        type: "success"
+      });
+      setEmailInput('');
+    }).catch(error => {
+      toast(error.response.data.error,{
+        ...toastOptions,
+        type: "error"
+      });
+    });
+
   }
 
   return (
@@ -40,6 +65,7 @@ const Home: NextPage = () => {
             </button>
           </div>
         </form>
+        <ToastContainer />
       </div>
     </div>
   )
